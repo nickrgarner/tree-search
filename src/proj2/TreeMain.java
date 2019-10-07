@@ -1,6 +1,7 @@
 package proj2;
 
 import java.util.Scanner;
+import proj2.Stack;
 
 public class TreeMain {
 	
@@ -34,7 +35,7 @@ public class TreeMain {
 		// Create tree
 		TreeMain treeMain = new TreeMain();
 		Tree tree1 = treeMain.new Tree();
-		tree1.setRoot(tree1.buildTree(numNodes, 0, posttrav.length));
+		tree1.setRoot(tree1.buildTree(numNodes, 0, 0));
 	}
 	
 	/**
@@ -126,6 +127,21 @@ public class TreeMain {
 		 * @param poststart Starting point of postorder traversal in postrav array
 		 */
 		public Node buildTree (int size, int prestart, int poststart) {
+			if (pretrav[prestart] == posttrav[poststart]) {
+				return new Node(pretrav[prestart], null, null);
+			}
+			else {
+				Node subtreeRoot = new Node(pretrav[prestart], null, new Node[size]);
+				subtreeRoot.child[0] = buildTree(--size, prestart + 1, poststart);
+				return subtreeRoot;
+			}
+			
+			
+			
+			
+			
+			
+			
 			Node subtreeRoot = new Node(pretrav[prestart], null, new Node[size]);
 			int subtreeSize = posttrav.toString().indexOf(posttrav[size - 1]) - pretrav.toString().indexOf(pretrav[prestart + 1]) + 2;
 			subtreeRoot.child[0] = new Node(pretrav[prestart + 1], subtreeRoot, new Node[subtreeSize]);
