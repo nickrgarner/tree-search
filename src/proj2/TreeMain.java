@@ -41,11 +41,10 @@ public class TreeMain {
 			posttrav[i] = posttravString.charAt(i);
 		}
 
-		System.out.println("NumChildren with size 5, prestart 1 and poststart 0\n" + numChildren(5, 1, 0));
-//		// Create tree
-//		TreeMain treeMain = new TreeMain();
-//		Tree tree1 = treeMain.new Tree();
-//		tree1.setRoot(tree1.buildTree(numNodes, 0, 0));
+		// Create tree
+		TreeMain treeMain = new TreeMain();
+		Tree tree1 = treeMain.new Tree();
+		tree1.setRoot(tree1.buildTree(numNodes, 0, 0));
 	}
 
 	/**
@@ -96,8 +95,8 @@ public class TreeMain {
 	 * Returns the number of children of a node based on its subtree's size,
 	 * pretraversal start and posttraversal start
 	 * 
-	 * @param size Size of the node's subtree
-	 * @param prestart Starting index of the subtree in the pretraversal array
+	 * @param size      Size of the node's subtree
+	 * @param prestart  Starting index of the subtree in the pretraversal array
 	 * @param poststart Starting index of the subtree in the posttraversal array
 	 * @return Number of children the node has
 	 */
@@ -118,8 +117,6 @@ public class TreeMain {
 				break;
 			}
 			preindex += subtreeSize;
-			System.out.println("Preindex: " + preindex + "\n");
-			System.out.println("Postindex: " + postindex + "\n");
 		}
 		return numChildren;
 	}
@@ -187,7 +184,6 @@ public class TreeMain {
 		 * @param root Node to set root to
 		 */
 		public void setRoot(Node root) {
-			// TODO Update this to manually traverse array and find root automatically
 			this.root = root;
 		}
 
@@ -222,8 +218,20 @@ public class TreeMain {
 			} else {
 				// Create child array
 				Node child[] = new Node[numChildren(size, prestart, poststart)];
+				prestart++;
+				// Loop through all children of current node
 				for (int i = 0; i < child.length; i++) {
-					child[i] = buildTree();
+					int preindex = prestart;
+					int postindex = poststart;
+					int subtreeSize = 1;
+					// Find subtreeSize of current child
+					while (posttrav[postindex] != pretrav[preindex]) {
+						subtreeSize++;
+					}
+					// Build child subtree then move to next child
+					child[i] = buildTree(subtreeSize, prestart, poststart);
+					prestart += subtreeSize;
+					poststart += subtreeSize;
 				}
 				// Make root
 				Node root = new Node(pretrav[prestart]);
@@ -334,12 +342,23 @@ public class TreeMain {
 
 			/**
 			 * Sets the parent pointer of this node to the given parameter
+			 * 
 			 * @param parent Node to set this node's parent pointer to
 			 */
 			private void setParent(Node parent) {
 				this.parent = parent;
 			}
-			
+
+			/**
+			 * Sets this node's mark to the given boolean value. Used for determining
+			 * relationships and resetting marks afterwards.
+			 * 
+			 * @param flag Value to set this node's mark to
+			 */
+			private void setMark(boolean flag) {
+				this.mark = flag;
+			}
+
 			/**
 			 * Returns true if this node contains no data
 			 * 
