@@ -220,10 +220,18 @@ public class TreeMain {
 			if (size == 1) {
 				return new Node(pretrav[prestart]);
 			} else {
-				// Get number of children
-				int firstChildPost = getIndex(posttrav, pretrav[prestart + 1]);
-				int firstChildSize = firstChildPost - poststart;
-
+				// Create child array
+				Node child[] = new Node[numChildren(size, prestart, poststart)];
+				for (int i = 0; i < child.length; i++) {
+					child[i] = buildTree();
+				}
+				// Make root
+				Node root = new Node(pretrav[prestart]);
+				root.setChildren(child);
+				// Set child parent pointers
+				for (int j = 0; j < root.getChildren().length; j++) {
+					root.getChildren()[j].setParent(root);
+				}
 				return root;
 //				Attempt #2	
 //				// Root with null child array
@@ -324,6 +332,14 @@ public class TreeMain {
 				return this.child;
 			}
 
+			/**
+			 * Sets the parent pointer of this node to the given parameter
+			 * @param parent Node to set this node's parent pointer to
+			 */
+			private void setParent(Node parent) {
+				this.parent = parent;
+			}
+			
 			/**
 			 * Returns true if this node contains no data
 			 * 
