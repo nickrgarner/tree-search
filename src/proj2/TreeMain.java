@@ -51,6 +51,7 @@ public class TreeMain {
 		
 		// Create level order queue, print level order
 		levelQueue = new Queue<Character>();
+		tree1.getRoot().printLevelOrder();
 	}
 
 	/**
@@ -222,6 +223,7 @@ public class TreeMain {
 			if (size == 1) {
 				return new Node(pretrav[prestart]);
 			} else {
+				char data = pretrav[prestart];
 				// Create child array
 				Node child[] = new Node[numChildren(size, prestart, poststart)];
 				prestart++;
@@ -232,7 +234,9 @@ public class TreeMain {
 					int subtreeSize = 1;
 					// Find subtreeSize of current child
 					while (posttrav[postindex] != pretrav[preindex]) {
+						//TODO Fix infinite loop
 						subtreeSize++;
+						postindex++;
 					}
 					// Build child subtree then move to next child
 					child[i] = buildTree(subtreeSize, prestart, poststart);
@@ -240,64 +244,14 @@ public class TreeMain {
 					poststart += subtreeSize;
 				}
 				// Make root
-				Node root = new Node(pretrav[prestart]);
+				Node root = new Node(data);
 				root.setChildren(child);
 				// Set child parent pointers
 				for (int j = 0; j < root.getChildren().length; j++) {
 					root.getChildren()[j].setParent(root);
 				}
 				return root;
-//				Attempt #2	
-//				// Root with null child array
-//				Node root = new Node(pretrav[prestart]);
-//				Node child[] = new Node[size];
-//				preindex = postindex + 1;
-//				// Find next child postindex
-//				int nextChildPostIndex = getIndex(posttrav, pretrav[preindex]);
-//				int subtreeSize = nextChildPostIndex - postindex;
-//				postindex = nextChildPostIndex;
-//				int i = 0;
-//				while (postindex < size) {
-//					child[i] = buildTree(subtreeSize, preindex, postindex);
-//				}
-//				root.setChildren(child);
-//				// Set parent pointers of children to root
-//				for (int j = 0; j < root.child.length; j++) {
-//					try {
-//						root.getChildren()[j].parent = root;
-//					} catch (NullPointerException e) {
-//						// No more children
-//						break;
-//					}
-//				}
-//				return root;
-//				
-//				Attempt #1
-//				Node[] child = new Node[size - 1];
-//				char nextNode = pretrav[prestart + 1];
-//				int subtreeSize = TreeMain.getIndex(posttrav, nextNode) - prestart + 1;
-//				child[1] = buildTree(subtreeSize, prestart + 1, TreeMain.getIndex(posttrav, nextNode));
-//				// Repeat for all children
-//				Node subRoot = new Node(pretrav[prestart], null, child);
-//				// Set parent pointers for all children
-//				for (int i = 0; i < child.length; i++) {
-//					try {
-//						subRoot.child[i].parent = subRoot;
-//					} catch (NullPointerException e) {
-//						// You've hit all children, break out of loop
-//						break;
-//					}
-//				}
-//				return subRoot;
 			}
-		}
-		
-		/**
-		 * Prints the level-order traversal of this tree
-		 */
-		public void printLevelOrder() {
-			
-			
 		}
 
 		private class Node {
@@ -423,6 +377,32 @@ public class TreeMain {
 					return true;
 				}
 				return false;
+			}
+			
+			/**
+			 * Prints the level-order traversal of this tree
+			 */
+			public void printLevelOrder() {
+				// Push this to queue
+				levelQueue.enqueue(this.getData());
+				// Visit children, push them
+				if (this.getChildren() != null) {
+					for (int i = 0; i < this.getChildren().length; i++) {
+						levelQueue.enqueue(this.getChildren()[i].getData());
+					}
+					// Run recursively on each child
+					for (int j = 0; j < this.getChildren().length; j++) {
+						this.getChildren()[j].printLevelOrder();
+					}
+				}
+				// Print queue
+				System.out.println("Level-order traversal:");
+				System.out.print(levelQueue.dequeue());
+				while (!levelQueue.isEmpty()) {
+					System.out.print(",");
+					System.out.print(" " + levelQueue.dequeue());
+				}
+				System.out.print(".");
 			}
 		}
 	}
