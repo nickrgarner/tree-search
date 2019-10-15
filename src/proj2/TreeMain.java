@@ -41,10 +41,11 @@ public class TreeMain {
 			posttrav[i] = posttravString.charAt(i);
 		}
 
-		// Create tree
-		TreeMain treeMain = new TreeMain();
-		Tree tree1 = treeMain.new Tree();
-		tree1.setRoot(tree1.buildTree(numNodes, 0, 0));
+		System.out.println("NumChildren with size 5, prestart 1 and poststart 0\n" + numChildren(5, 1, 0));
+//		// Create tree
+//		TreeMain treeMain = new TreeMain();
+//		Tree tree1 = treeMain.new Tree();
+//		tree1.setRoot(tree1.buildTree(numNodes, 0, 0));
 	}
 
 	/**
@@ -91,18 +92,34 @@ public class TreeMain {
 		return -1;
 	}
 
-	public int numChildren(char[] pretrav, char[] posttrav, int size) {
-		int preindex = 1;
-		int postindex = 0;
+	/**
+	 * Returns the number of children of a node based on its subtree's size,
+	 * pretraversal start and posttraversal start
+	 * 
+	 * @param size Size of the node's subtree
+	 * @param prestart Starting index of the subtree in the pretraversal array
+	 * @param poststart Starting index of the subtree in the posttraversal array
+	 * @return Number of children the node has
+	 */
+	public static int numChildren(int size, int prestart, int poststart) {
+		char rootChar = pretrav[prestart];
+		int preindex = prestart + 1;
+		int postindex = poststart;
 		int numChildren = 0;
 		while (postindex < size) {
-			int subtreeSize = 0;
+			int subtreeSize = 1;
 			while (posttrav[postindex] != pretrav[preindex]) {
 				postindex++;
 				subtreeSize++;
 			}
+			numChildren++;
 			postindex++;
-
+			if (posttrav[postindex] == rootChar) {
+				break;
+			}
+			preindex += subtreeSize;
+			System.out.println("Preindex: " + preindex + "\n");
+			System.out.println("Postindex: " + postindex + "\n");
 		}
 		return numChildren;
 	}
@@ -203,30 +220,37 @@ public class TreeMain {
 			if (size == 1) {
 				return new Node(pretrav[prestart]);
 			} else {
-				// Root with null child array
-				Node root = new Node(pretrav[prestart]);
-				Node child[] = new Node[size];
-				preindex = postindex + 1;
-				// Find next child postindex
-				int nextChildPostIndex = getIndex(posttrav, pretrav[preindex]);
-				int subtreeSize = nextChildPostIndex - postindex;
-				postindex = nextChildPostIndex;
-				int i = 0;
-				while (postindex < size) {
-					child[i] = buildTree(subtreeSize, preindex, postindex);
-				}
-				root.setChildren(child);
-				// Set parent pointers of children to root
-				for (int j = 0; j < root.child.length; j++) {
-					try {
-						root.getChildren()[j].parent = root;
-					} catch (NullPointerException e) {
-						// No more children
-						break;
-					}
-				}
+				// Get number of children
+				int firstChildPost = getIndex(posttrav, pretrav[prestart + 1]);
+				int firstChildSize = firstChildPost - poststart;
+
 				return root;
+//				Attempt #2	
+//				// Root with null child array
+//				Node root = new Node(pretrav[prestart]);
+//				Node child[] = new Node[size];
+//				preindex = postindex + 1;
+//				// Find next child postindex
+//				int nextChildPostIndex = getIndex(posttrav, pretrav[preindex]);
+//				int subtreeSize = nextChildPostIndex - postindex;
+//				postindex = nextChildPostIndex;
+//				int i = 0;
+//				while (postindex < size) {
+//					child[i] = buildTree(subtreeSize, preindex, postindex);
+//				}
+//				root.setChildren(child);
+//				// Set parent pointers of children to root
+//				for (int j = 0; j < root.child.length; j++) {
+//					try {
+//						root.getChildren()[j].parent = root;
+//					} catch (NullPointerException e) {
+//						// No more children
+//						break;
+//					}
+//				}
+//				return root;
 //				
+//				Attempt #1
 //				Node[] child = new Node[size - 1];
 //				char nextNode = pretrav[prestart + 1];
 //				int subtreeSize = TreeMain.getIndex(posttrav, nextNode) - prestart + 1;
