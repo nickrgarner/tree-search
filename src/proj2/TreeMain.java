@@ -1,7 +1,9 @@
 package proj2;
 
 import java.util.Scanner;
-import proj2.Stack;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 
 public class TreeMain {
 
@@ -11,9 +13,16 @@ public class TreeMain {
 	/** Array containing the Posttraversal order from input */
 	public static char posttrav[];
 
+	/** Current spot in the preorder traversal */
+	public static int preindex = 0;
+
+	/** Current spot in the postorder traversal */
+	public static int postindex = -1;
+
 	public static void main(String[] args) {
 		// Setup Scanner
-		Scanner input = new Scanner(System.in);
+		// Scanner input = new Scanner(System.in);
+		BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
 		String pretravString = getInputString(input);
 		String posttravString = getInputString(input);
 		int numNodes = pretravString.length();
@@ -39,25 +48,28 @@ public class TreeMain {
 	}
 
 	/**
-	 * Scans the first line of input and returns the number of nodes contained
+	 * Scans the first line of input and returns a string of chars representing the
+	 * node labels in the traversal order
 	 * 
-	 * @param input Scanner object parsing the tree input
-	 * @return Number of nodes contained in the input
+	 * @param input BufferedReader object parsing the traversal input
+	 * @return String containing just the Node ideas in the traversal
 	 */
-	public static String getInputString(Scanner input) {
+	public static String getInputString(BufferedReader input) {
 		String inputString = "";
-		String temp = input.next();
-		if (temp.equals("\n")) {
-			temp = input.next();
-		}
-		if (temp.equals(">") || temp.equals("<")) {
-			temp = input.next();
-			while (!temp.equals(".")) {
-				if (!temp.equals(",")) {
-					inputString += temp;
-				}
-				temp = input.next();
+		try {
+			char temp = (char) input.read();
+			if (temp == '.') {
+				temp = (char) input.read();
 			}
+			while (temp != '.') {
+				while (!Character.isLetter(temp)) {
+					temp = (char) input.read();
+				}
+				inputString += temp;
+				temp = (char) input.read();
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 		return inputString;
 	}
@@ -77,6 +89,22 @@ public class TreeMain {
 			}
 		}
 		return -1;
+	}
+
+	public int numChildren(char[] pretrav, char[] posttrav, int size) {
+		int preindex = 1;
+		int postindex = 0;
+		int numChildren = 0;
+		while (postindex < size) {
+			int subtreeSize = 0;
+			while (posttrav[postindex] != pretrav[preindex]) {
+				postindex++;
+				subtreeSize++;
+			}
+			postindex++;
+
+		}
+		return numChildren;
 	}
 
 	class Tree {
@@ -167,29 +195,54 @@ public class TreeMain {
 		 * Recursively builds the tree from preorder and postorder traversal input
 		 * 
 		 * @param size      Number of nodes in subtree to be built
-		 * @param prestart  Starting point of preorder traversal in pretrav array
-		 * @param poststart Starting point of postorder traversal in postrav array
+		 * @param prestart  Starting point of subtree in pretrav array
+		 * @param poststart Starting point of subtree in postrav array
 		 */
 		public Node buildTree(int size, int prestart, int poststart) {
+			// Base case
 			if (size == 1) {
-				return new Node(pretrav[prestart], null, null);
+				return new Node(pretrav[prestart]);
 			} else {
-				Node[] child = new Node[size - 1];
-				int subtreeSize = poststart - (prestart + 1);
-				char nextNode = pretrav[prestart + 1];
-				child[1] = buildTree(subtreeSize, prestart + 1, TreeMain.getIndex(posttrav, nextNode));
-				// Repeat for all children
-				Node subRoot = new Node(pretrav[prestart], null, child);
-				// Set parent pointers for all children
-				for (int i = 0; i < child.length; i++) {
+				// Root with null child array
+				Node root = new Node(pretrav[prestart]);
+				Node child[] = new Node[size];
+				preindex = postindex + 1;
+				// Find next child postindex
+				int nextChildPostIndex = getIndex(posttrav, pretrav[preindex]);
+				int subtreeSize = nextChildPostIndex - postindex;
+				postindex = nextChildPostIndex;
+				int i = 0;
+				while (postindex < size) {
+					child[i] = buildTree(subtreeSize, preindex, postindex);
+				}
+				root.setChildren(child);
+				// Set parent pointers of children to root
+				for (int j = 0; j < root.child.length; j++) {
 					try {
-						subRoot.child[i].parent = subRoot;
+						root.getChildren()[j].parent = root;
 					} catch (NullPointerException e) {
-						// You've hit all children, break out of loop
+						// No more children
 						break;
 					}
 				}
-				return subRoot;
+				return root;
+//				
+//				Node[] child = new Node[size - 1];
+//				char nextNode = pretrav[prestart + 1];
+//				int subtreeSize = TreeMain.getIndex(posttrav, nextNode) - prestart + 1;
+//				child[1] = buildTree(subtreeSize, prestart + 1, TreeMain.getIndex(posttrav, nextNode));
+//				// Repeat for all children
+//				Node subRoot = new Node(pretrav[prestart], null, child);
+//				// Set parent pointers for all children
+//				for (int i = 0; i < child.length; i++) {
+//					try {
+//						subRoot.child[i].parent = subRoot;
+//					} catch (NullPointerException e) {
+//						// You've hit all children, break out of loop
+//						break;
+//					}
+//				}
+//				return subRoot;
 			}
 		}
 
@@ -211,6 +264,10 @@ public class TreeMain {
 				this(' ', null, null);
 			}
 
+			public Node(char data) {
+				this(data, null, null);
+			}
+
 			/**
 			 * Constructs a new node from the given data and parent and child pointers.
 			 * 
@@ -223,6 +280,24 @@ public class TreeMain {
 				this.parent = parent;
 				this.child = child;
 				mark = false;
+			}
+
+			/**
+			 * Sets the children of this node to the given array of pointers
+			 * 
+			 * @param children Array of pointers to children of this node
+			 */
+			private void setChildren(Node[] children) {
+				this.child = children;
+			}
+
+			/**
+			 * Returns this node's array of child pointers
+			 * 
+			 * @return This node's array of child pointers
+			 */
+			private Node[] getChildren() {
+				return this.child;
 			}
 
 			/**
