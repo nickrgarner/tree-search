@@ -51,7 +51,14 @@ public class TreeMain {
 		
 		// Create level order queue, print level order
 		levelQueue = new Queue<Character>();
-		tree1.getRoot().printLevelOrder();
+		levelQueue.enqueue(tree1.getRoot().getData());
+		tree1.getRoot().fillLevelQueue();
+		System.out.println("Level-order traversal:");
+		System.out.print(levelQueue.dequeue());
+		while(!levelQueue.isEmpty()) {
+			System.out.print(", " + levelQueue.dequeue());
+		}
+		System.out.print(".");
 	}
 
 	/**
@@ -112,7 +119,7 @@ public class TreeMain {
 		int preindex = prestart + 1;
 		int postindex = poststart;
 		int numChildren = 0;
-		while (postindex < size) {
+		while (postindex < postindex + size) {
 			int subtreeSize = 1;
 			while (posttrav[postindex] != pretrav[preindex]) {
 				postindex++;
@@ -234,7 +241,6 @@ public class TreeMain {
 					int subtreeSize = 1;
 					// Find subtreeSize of current child
 					while (posttrav[postindex] != pretrav[preindex]) {
-						//TODO Fix infinite loop
 						subtreeSize++;
 						postindex++;
 					}
@@ -382,9 +388,7 @@ public class TreeMain {
 			/**
 			 * Prints the level-order traversal of this tree
 			 */
-			public void printLevelOrder() {
-				// Push this to queue
-				levelQueue.enqueue(this.getData());
+			public void fillLevelQueue() {
 				// Visit children, push them
 				if (this.getChildren() != null) {
 					for (int i = 0; i < this.getChildren().length; i++) {
@@ -392,17 +396,9 @@ public class TreeMain {
 					}
 					// Run recursively on each child
 					for (int j = 0; j < this.getChildren().length; j++) {
-						this.getChildren()[j].printLevelOrder();
+						this.getChildren()[j].fillLevelQueue();
 					}
 				}
-				// Print queue
-				System.out.println("Level-order traversal:");
-				System.out.print(levelQueue.dequeue());
-				while (!levelQueue.isEmpty()) {
-					System.out.print(",");
-					System.out.print(" " + levelQueue.dequeue());
-				}
-				System.out.print(".");
 			}
 		}
 	}
