@@ -12,19 +12,12 @@ public class TreeMain {
 
 	/** Array containing the Posttraversal order from input */
 	public static char posttrav[];
-
-	/** Current spot in the preorder traversal */
-	public static int preindex = 0;
-
-	/** Current spot in the postorder traversal */
-	public static int postindex = -1;
 	
 	/** Queue to hold nodes in level order traversal for printing */
-	public static Queue<Character> levelQueue;
+	public static Queue<Tree.Node> nodeQueue;
 
 	public static void main(String[] args) {
-		// Setup Scanner
-		// Scanner input = new Scanner(System.in);
+		// Setup BufferedReader for input
 		BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
 		String pretravString = getInputString(input);
 		String posttravString = getInputString(input);
@@ -50,15 +43,9 @@ public class TreeMain {
 		tree1.setRoot(tree1.buildTree(numNodes, 0, 0));
 		
 		// Create level order queue, print level order
-		levelQueue = new Queue<Character>();
-		levelQueue.enqueue(tree1.getRoot().getData());
-		tree1.getRoot().fillLevelQueue();
-		System.out.println("Level-order traversal:");
-		System.out.print(levelQueue.dequeue());
-		while(!levelQueue.isEmpty()) {
-			System.out.print(", " + levelQueue.dequeue());
-		}
-		System.out.print(".");
+		nodeQueue = new Queue<Tree.Node>();
+		System.out.println("Level-Order Traversal:");
+		tree1.getRoot().levelOrder();
 	}
 
 	/**
@@ -388,18 +375,48 @@ public class TreeMain {
 			/**
 			 * Prints the level-order traversal of this tree
 			 */
-			public void fillLevelQueue() {
-				// Visit children, push them
-				if (this.getChildren() != null) {
-					for (int i = 0; i < this.getChildren().length; i++) {
-						levelQueue.enqueue(this.getChildren()[i].getData());
-					}
-					// Run recursively on each child
-					for (int j = 0; j < this.getChildren().length; j++) {
-						this.getChildren()[j].fillLevelQueue();
+//			public void fillLevelQueue() {
+//				// Visit children, push them
+//				if (this.getChildren() != null) {
+//					for (int i = 0; i < this.getChildren().length; i++) {
+//						levelQueue.enqueue(this.getChildren()[i].getData());
+//					}
+//					// Run recursively on each child
+//					for (int j = 0; j < this.getChildren().length; j++) {
+//						this.getChildren()[j].fillLevelQueue();
+//					}
+//				}
+//			}
+//			
+			public void levelOrder() {
+				nodeQueue.enqueue(this);
+				while (!nodeQueue.isEmpty()) {
+					Node q = nodeQueue.dequeue();
+					System.out.print(q.getData() + ", ");
+					if (q.getChildren() != null) {
+						for (int i = 0; i < q.getChildren().length; i++) {
+							nodeQueue.enqueue(q.getChildren()[i]);
+						}
 					}
 				}
 			}
 		}
 	}
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
