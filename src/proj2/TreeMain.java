@@ -42,7 +42,12 @@ public class TreeMain {
 		Tree tree1 = treeMain.new Tree();
 		tree1.setRoot(tree1.buildTree(numNodes, 0, 0));
 		
-		// Create level order queue, print level order
+		// Create string of relationship queries
+		String queries = getRelationshipQueries(input);
+		
+		System.out.println(queries);
+		
+		// Create level order queue and print
 		nodeQueue = new Queue<Tree.Node>();
 		System.out.println("Level-Order Traversal:");
 		tree1.getRoot().levelOrder();
@@ -73,6 +78,41 @@ public class TreeMain {
 			e.printStackTrace();
 		}
 		return inputString;
+	}
+	
+	public static String getRelationshipQueries(BufferedReader input) {
+		String queryString = "";
+		try {
+			int i = 0;
+			while (i < 25) {
+				char symbol = (char) input.read();
+				i++;
+				while (!Character.isLetter(symbol)) {
+					symbol = (char) input.read();
+					i++;
+				}
+				queryString += symbol;
+//			char symbol = ' ';
+//			int charNumber = 0;
+////			if (symbol == '.') {
+////				charNumber = input.read();
+////			}
+//			while (charNumber != -1) {
+////				symbol = (char) charNumber;
+//				while (!Character.isLetter(symbol) && charNumber != -1) {
+//					symbol = (char) charNumber;
+//					charNumber = input.read();
+//				}
+//				queryString += symbol;
+//				if (charNumber == -1) {
+//					break;
+//				}
+//				charNumber = input.read();
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return queryString;
 	}
 
 	/**
