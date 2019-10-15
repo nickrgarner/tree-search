@@ -1,9 +1,9 @@
 package proj2;
 
-import java.util.Scanner;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import proj2.Queue;
 
 public class TreeMain {
 
@@ -18,6 +18,9 @@ public class TreeMain {
 
 	/** Current spot in the postorder traversal */
 	public static int postindex = -1;
+	
+	/** Queue to hold nodes in level order traversal for printing */
+	public static Queue<Character> levelQueue;
 
 	public static void main(String[] args) {
 		// Setup Scanner
@@ -45,6 +48,9 @@ public class TreeMain {
 		TreeMain treeMain = new TreeMain();
 		Tree tree1 = treeMain.new Tree();
 		tree1.setRoot(tree1.buildTree(numNodes, 0, 0));
+		
+		// Create level order queue, print level order
+		levelQueue = new Queue<Character>();
 	}
 
 	/**
@@ -121,7 +127,7 @@ public class TreeMain {
 		return numChildren;
 	}
 
-	class Tree {
+	public class Tree {
 
 		/** Root of tree */
 		private Node root;
@@ -285,6 +291,14 @@ public class TreeMain {
 //				return subRoot;
 			}
 		}
+		
+		/**
+		 * Prints the level-order traversal of this tree
+		 */
+		public void printLevelOrder() {
+			
+			
+		}
 
 		private class Node {
 
@@ -357,6 +371,10 @@ public class TreeMain {
 			 */
 			private void setMark(boolean flag) {
 				this.mark = flag;
+			}
+			
+			private char getData() {
+				return this.data;
 			}
 
 			/**
