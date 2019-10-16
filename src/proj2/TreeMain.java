@@ -3,7 +3,6 @@ package proj2;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import proj2.Queue;
 
 public class TreeMain {
 
@@ -43,12 +42,10 @@ public class TreeMain {
 		tree1.setRoot(tree1.buildTree(numNodes, 0, 0));
 		
 		// Create string of relationship queries
-		String queries = getRelationshipQueries(input);
-		
-		System.out.println(queries);
+		String queries = getQueryString(input);
 		
 		// Create level order queue and print
-		nodeQueue = new Queue<Tree.Node>();
+		nodeQueue = treeMain.new Queue<Tree.Node>();
 		System.out.println("Level-Order Traversal:");
 		tree1.getRoot().levelOrder();
 	}
@@ -80,34 +77,21 @@ public class TreeMain {
 		return inputString;
 	}
 	
-	public static String getRelationshipQueries(BufferedReader input) {
+	public static String getQueryString(BufferedReader input) {
 		String queryString = "";
 		try {
-			int i = 0;
-			while (i < 25) {
-				char symbol = (char) input.read();
-				i++;
-				while (!Character.isLetter(symbol)) {
-					symbol = (char) input.read();
-					i++;
+			char symbol = ' ';
+			int charNumber = 0;
+			while (charNumber != -1) {
+				symbol = (char) charNumber;
+				while (!Character.isLetter(symbol) && charNumber != -1) {
+					symbol = (char) charNumber;
+					charNumber = input.read();
 				}
-				queryString += symbol;
-//			char symbol = ' ';
-//			int charNumber = 0;
-////			if (symbol == '.') {
-////				charNumber = input.read();
-////			}
-//			while (charNumber != -1) {
-////				symbol = (char) charNumber;
-//				while (!Character.isLetter(symbol) && charNumber != -1) {
-//					symbol = (char) charNumber;
-//					charNumber = input.read();
-//				}
-//				queryString += symbol;
-//				if (charNumber == -1) {
-//					break;
-//				}
-//				charNumber = input.read();
+				if (Character.isLetter(symbol)) {
+					queryString += symbol;
+				}
+				charNumber = input.read();
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -439,6 +423,117 @@ public class TreeMain {
 						}
 					}
 				}
+			}
+		}
+	}
+	
+	/**
+	 * Class defines state and behavior for a linked-list based Queue data
+	 * structure. To be used for printing a tree's level order traversal.
+	 * 
+	 * @author Nick Garner, nrgarner
+	 *
+	 * @param <E> Generic data type
+	 */
+	public class Queue<E> {
+
+		/** Node at the front of the list */
+		private Node front;
+		/** Number of items in the queue */
+		private int size;
+
+		/**
+		 * Creates an empty queue with a null front node and a size of 0
+		 */
+		public Queue() {
+			front = null;
+			size = 0;
+		}
+
+		/**
+		 * Add a new node with the given value to the end of the queue
+		 * 
+		 * @param data Value to create the new node with
+		 */
+		public void enqueue(E data) {
+			if (front == null) {
+				front = new Node(data);
+			} else {
+				Node current = front;
+				while (current.next != null) {
+					current = current.next;
+				}
+				current.next = new Node(data);
+			}
+			size++;
+		}
+
+		/**
+		 * Removes the node at the front of the queue and returns its value
+		 * 
+		 * @return Value in the removed front node of the queue
+		 */
+		public E dequeue() {
+			if (front == null || size == 0) {
+				throw new IllegalArgumentException("Queue is empty");
+			} else {
+				E temp = front.data;
+				front = front.next;
+				size--;
+				return temp;
+			}
+		}
+
+		/**
+		 * Returns number of items in the queue
+		 * 
+		 * @return Number of items in the queue
+		 */
+		public int size() {
+			return size;
+		}
+
+		/**
+		 * Returns true if the queue is empty
+		 * 
+		 * @return True if queue is empty, false otherwise
+		 */
+		public boolean isEmpty() {
+			return size == 0;
+		}
+
+		/**
+		 * Private class defining state and constructors for Nodes to be used in the
+		 * linked Queue
+		 * 
+		 * @author Nick Garner, nrgarner
+		 *
+		 */
+		private class Node {
+
+			/** Value to hold in the node */
+			private E data;
+			/** Pointer to the next node in the Queue */
+			private Node next;
+
+			/**
+			 * Constructs a new node with the given value and a null next pointer
+			 * 
+			 * @param data Value to construct the new node with
+			 */
+			public Node(E data) {
+				this(data, null);
+			}
+
+			/**
+			 * Constructs a new node with the given value and next pointer
+			 * 
+			 * @param data Value to construct the node with
+			 * @param next Pointer to the next node in the queue
+			 */
+			public Node(E data, Node next) {
+				this.data = data;
+				this.next = next;
 			}
 		}
 	}
