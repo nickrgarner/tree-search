@@ -78,6 +78,14 @@ public class TreeMain {
 		return inputString;
 	}
 
+	/**
+	 * Parses the input file past the traversal orders to convert all relationship
+	 * queries into a single string of letters
+	 * 
+	 * @param input BufferedReader object parsing the input file
+	 * @return String containing letters of all the relationship queries in the
+	 *         input
+	 */
 	public static String getQueryString(BufferedReader input) {
 		String queryString = "";
 		try {
@@ -159,8 +167,6 @@ public class TreeMain {
 		 */
 		public Tree() {
 			this(null);
-//			root = new Node(pretrav[0], null, new Node[pretrav.length]);
-//			size = 1;
 		}
 
 		/**
@@ -210,14 +216,6 @@ public class TreeMain {
 			return this.root;
 		}
 
-		/**
-		 * Traverses the array in preorder and resets all relationship markers back to
-		 * false after a relationship inquiry is performed.
-		 */
-		public void resetMarks() {
-			// TODO Reset relationship markers of all nodes
-		}
-
 		public void printRelationships(String queryString) {
 			for (int i = 0; i < queryString.length(); i += 2) {
 				System.out.println(this.getRelationship(queryString.charAt(i), queryString.charAt(i + 1)));
@@ -229,21 +227,25 @@ public class TreeMain {
 			Node node1 = this.lookup(char1);
 			Node node2 = this.lookup(char2);
 
+			// Reset relationship markers
+			node1.resetMarks();
+			node2.resetMarks();
 			return "";
 		}
 
 		/**
 		 * Performs a pre-order traversal of the tree to find the Node containing the
-		 * given data.
+		 * given data. Marks nodes in the target's ancestry chain for determining
+		 * relationships.
 		 * 
 		 * @param data The Node value to lookup
 		 * @return Node containing the given data parameter.
 		 */
 		public Node lookup(char data) {
-//			char rootChar = this.getRoot().getData();
 			String lineage = this.getLineage(data);
-			
+
 			Node current = this.getRoot();
+			current.setMark(true);
 			int index = lineage.length() - 1;
 			while (current.getData() != data) {
 				if (current.getData() == lineage.charAt(index)) {
@@ -252,6 +254,7 @@ public class TreeMain {
 				for (int i = 0; i < current.getChildren().length; i++) {
 					if (current.getChildren()[i].getData() == lineage.charAt(index)) {
 						current = current.getChildren()[i];
+						current.setMark(true);
 						break;
 					}
 				}
@@ -423,6 +426,15 @@ public class TreeMain {
 			}
 
 			/**
+			 * Returns a pointer to this node's parent.
+			 * 
+			 * @return Pointer to this node's parent.
+			 */
+			public Node getParent() {
+				return this.parent;
+			}
+
+			/**
 			 * Sets this node's mark to the given boolean value. Used for determining
 			 * relationships and resetting marks afterwards.
 			 * 
@@ -485,6 +497,19 @@ public class TreeMain {
 			}
 
 			/**
+			 * Traverses upwards through this node's ancestry chain and resets all
+			 * relationship marks back to false.
+			 */
+			public void resetMarks() {
+				Node current = this;
+				current.setMark(false);
+				while (current.getParent() != null) {
+					current = current.getParent();
+					current.setMark(false);
+				}
+			}
+
+			/**
 			 * Prints the level-order traversal of this tree
 			 */
 			public void levelOrder() {
@@ -499,33 +524,6 @@ public class TreeMain {
 					}
 				}
 			}
-
-//			/**
-//			 * Performs a pre-order traversal of the tree to find the Node containing the
-//			 * given data.
-//			 * 
-//			 * @param data The Node value to lookup
-//			 * @return Node containing the given data parameter.
-//			 */
-//			public Node lookup(char data) {
-//				if (data == this.getData()) {
-//					return this;
-//				}
-//				else if (this.childrenContains(data)) {
-//					for (int i = 0; i < this.getChildren().length; i++) {
-//						if (this.getChildren()[i].getData() == data) {
-//							return this.getChildren()[i];
-//						}
-//					}
-//				} else {
-//					if (this.getChildren() != null) {
-//						for (int i = 0; i < this.getChildren().length; i++) {
-//							return this.getChildren()[i].lookup(data);
-//						}
-//					}
-//				}
-//				return null;
-//			}
 		}
 	}
 
