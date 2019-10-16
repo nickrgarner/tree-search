@@ -306,35 +306,31 @@ public class TreeMain {
 			if (data == rootChar) {
 				return "" + rootChar;
 			}
-			String lineage = "" + data;
+			String lineage = "";
+			lineage += data;
 
-			// Think I need to loop here until parent = root
 			int preindex = getIndex(pretrav, data);
 			int postindex = getIndex(posttrav, data);
 			char parent = ' ';
-//			while (parent != rootChar) {
-				String pretravBackwards = "";
-				for (int i = preindex; i > 0; i--) {
-					pretravBackwards += pretrav[i];
-				}
-				// Loop through posttraversal and compare to pretravBackwards to find parent
+			// Keep looping through ancestors until hitting root
+			while (parent != rootChar) {
+				// Loop through posttrav and compare to pretrav backwards to find parent
 				for (int i = postindex + 1; i < posttrav.length; i++) {
-					char temp = posttrav[i];
-					for (int j = 0; j < pretravBackwards.length(); j++) {
-						if (pretravBackwards.charAt(j) == temp) {
+					for (int j = preindex - 1; j >= 0; j--) {
+						if (pretrav[j] == posttrav[i]) {
 							// It's the parent
-							parent = pretravBackwards.charAt(j);
+							parent = posttrav[i];
 							break;
 						}
 					}
-					if (parent == temp) {
+					if (posttrav[i] == parent) {
 						break;
 					}
 				}
 				lineage += parent;
 				preindex = getIndex(pretrav, parent);
 				postindex = getIndex(posttrav, parent);
-//			}
+			}
 			return lineage;
 		}
 
