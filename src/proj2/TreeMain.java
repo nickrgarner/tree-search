@@ -11,7 +11,7 @@ public class TreeMain {
 
 	/** Array containing the Posttraversal order from input */
 	public static char posttrav[];
-	
+
 	/** Queue to hold nodes in level order traversal for printing */
 	public static Queue<Tree.Node> nodeQueue;
 
@@ -40,14 +40,18 @@ public class TreeMain {
 		TreeMain treeMain = new TreeMain();
 		Tree tree1 = treeMain.new Tree();
 		tree1.setRoot(tree1.buildTree(numNodes, 0, 0));
-		
+
 		// Create string of relationship queries
 		String queries = getQueryString(input);
-		
+//		tree1.printRelationships(queries);
+
 		// Create level order queue and print
 		nodeQueue = treeMain.new Queue<Tree.Node>();
 		System.out.println("Level-Order Traversal:");
 		tree1.getRoot().levelOrder();
+		
+		System.out.println("\nLineage for Node W:");
+		System.out.println(tree1.getLineage('W'));
 	}
 
 	/**
@@ -76,7 +80,7 @@ public class TreeMain {
 		}
 		return inputString;
 	}
-	
+
 	public static String getQueryString(BufferedReader input) {
 		String queryString = "";
 		try {
@@ -171,18 +175,6 @@ public class TreeMain {
 		}
 
 		/**
-		 * Performs a pre-order traversal of the tree to find the Node containing the
-		 * given data.
-		 * 
-		 * @param data The Node value to lookup
-		 * @return Node containing the given data parameter.
-		 */
-		public Node lookup(char data) {
-			// TODO
-			return null;
-		}
-
-		/**
 		 * Returns true if tree is empty.
 		 * 
 		 * @return True if empty.
@@ -227,6 +219,123 @@ public class TreeMain {
 		 */
 		public void resetMarks() {
 			// TODO Reset relationship markers of all nodes
+		}
+
+		public void printRelationships(String queryString) {
+			for (int i = 0; i < queryString.length(); i += 2) {
+				System.out.println(this.getRelationship(queryString.charAt(i), queryString.charAt(i + 1)));
+			}
+		}
+
+		public String getRelationship(char char1, char char2) {
+			// Get pointers to target nodes
+			Node node1 = this.lookup(char1);
+			Node node2 = this.lookup(char2);
+
+			return "";
+		}
+
+		/**
+		 * Performs a pre-order traversal of the tree to find the Node containing the
+		 * given data.
+		 * 
+		 * @param data The Node value to lookup
+		 * @return Node containing the given data parameter.
+		 */
+		public Node lookup(char data) {
+			char rootChar = this.getRoot().getData();
+			String lineage = "" + data;
+
+			// Think I need to loop here until parent = root
+			int preindex = getIndex(pretrav, data);
+			int postindex = getIndex(posttrav, data);
+			char parent = ' ';
+			while (parent != rootChar) {
+				String pretravBackwards = "";
+				for (int i = preindex; i > 0; i--) {
+					pretravBackwards += pretrav[i];
+				}
+				// Loop through posttraversal and compare to pretravBackwards to find parent
+				for (int i = postindex + 1; i < posttrav.length; i++) {
+					char temp = posttrav[i];
+					for (int j = 0; j < pretravBackwards.length(); j++) {
+						if (pretravBackwards.charAt(j) == temp) {
+							// It's the parent
+							parent = pretravBackwards.charAt(j);
+							break;
+						}
+					}
+					if (parent == temp) {
+						break;
+					}
+				}
+				lineage += parent;
+				preindex = getIndex(pretrav, parent);
+				postindex = getIndex(posttrav, parent);
+			}
+			return null;
+//			if (data == this.getData()) {
+//				return this;
+//			}
+//			else if (this.childrenContains(data)) {
+//				for (int i = 0; i < this.getChildren().length; i++) {
+//					if (this.getChildren()[i].getData() == data) {
+//						return this.getChildren()[i];
+//					}
+//				}
+//			} else {
+//				if (this.getChildren() != null) {
+//					for (int i = 0; i < this.getChildren().length; i++) {
+//						return this.getChildren()[i].lookup(data);
+//					}
+//				}
+//			}
+//			return null;
+		}
+
+		/**
+		 * Returns a string representation of a node's lineage up to the root, for
+		 * lookup traversal
+		 * 
+		 * @param data Char value of the node you want the lineage for
+		 * @return String representation of node's lineage, starting at target node and
+		 *         ending at root of tree
+		 */
+		public String getLineage(char data) {
+			char rootChar = this.getRoot().getData();
+			if (data == rootChar) {
+				return "" + rootChar;
+			}
+			String lineage = "" + data;
+
+			// Think I need to loop here until parent = root
+			int preindex = getIndex(pretrav, data);
+			int postindex = getIndex(posttrav, data);
+			char parent = ' ';
+//			while (parent != rootChar) {
+				String pretravBackwards = "";
+				for (int i = preindex; i > 0; i--) {
+					pretravBackwards += pretrav[i];
+				}
+				// Loop through posttraversal and compare to pretravBackwards to find parent
+				for (int i = postindex + 1; i < posttrav.length; i++) {
+					char temp = posttrav[i];
+					for (int j = 0; j < pretravBackwards.length(); j++) {
+						if (pretravBackwards.charAt(j) == temp) {
+							// It's the parent
+							parent = pretravBackwards.charAt(j);
+							break;
+						}
+					}
+					if (parent == temp) {
+						break;
+					}
+				}
+				lineage += parent;
+				preindex = getIndex(pretrav, parent);
+				postindex = getIndex(posttrav, parent);
+//			}
+			return lineage;
 		}
 
 		/**
@@ -321,8 +430,25 @@ public class TreeMain {
 			 * 
 			 * @return This node's array of child pointers
 			 */
-			private Node[] getChildren() {
+			public Node[] getChildren() {
 				return this.child;
+			}
+
+			/**
+			 * Returns true if any of this node's children match the given char value
+			 * 
+			 * @param data Value to search this node's children for
+			 * @return True if any children match the given char
+			 */
+			public boolean childrenContains(char data) {
+				if (this.getChildren() != null) {
+					for (int i = 0; i < this.getChildren().length; i++) {
+						if (this.getChildren()[i].getData() == data) {
+							return true;
+						}
+					}
+				}
+				return false;
 			}
 
 			/**
@@ -343,8 +469,8 @@ public class TreeMain {
 			private void setMark(boolean flag) {
 				this.mark = flag;
 			}
-			
-			private char getData() {
+
+			public char getData() {
 				return this.data;
 			}
 
@@ -395,23 +521,10 @@ public class TreeMain {
 				}
 				return false;
 			}
-			
+
 			/**
 			 * Prints the level-order traversal of this tree
 			 */
-//			public void fillLevelQueue() {
-//				// Visit children, push them
-//				if (this.getChildren() != null) {
-//					for (int i = 0; i < this.getChildren().length; i++) {
-//						levelQueue.enqueue(this.getChildren()[i].getData());
-//					}
-//					// Run recursively on each child
-//					for (int j = 0; j < this.getChildren().length; j++) {
-//						this.getChildren()[j].fillLevelQueue();
-//					}
-//				}
-//			}
-//			
 			public void levelOrder() {
 				nodeQueue.enqueue(this);
 				while (!nodeQueue.isEmpty()) {
@@ -424,9 +537,36 @@ public class TreeMain {
 					}
 				}
 			}
+
+//			/**
+//			 * Performs a pre-order traversal of the tree to find the Node containing the
+//			 * given data.
+//			 * 
+//			 * @param data The Node value to lookup
+//			 * @return Node containing the given data parameter.
+//			 */
+//			public Node lookup(char data) {
+//				if (data == this.getData()) {
+//					return this;
+//				}
+//				else if (this.childrenContains(data)) {
+//					for (int i = 0; i < this.getChildren().length; i++) {
+//						if (this.getChildren()[i].getData() == data) {
+//							return this.getChildren()[i];
+//						}
+//					}
+//				} else {
+//					if (this.getChildren() != null) {
+//						for (int i = 0; i < this.getChildren().length; i++) {
+//							return this.getChildren()[i].lookup(data);
+//						}
+//					}
+//				}
+//				return null;
+//			}
 		}
 	}
-	
+
 	/**
 	 * Class defines state and behavior for a linked-list based Queue data
 	 * structure. To be used for printing a tree's level order traversal.
@@ -538,20 +678,3 @@ public class TreeMain {
 		}
 	}
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
