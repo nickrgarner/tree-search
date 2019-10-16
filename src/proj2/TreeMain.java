@@ -216,16 +216,116 @@ public class TreeMain {
 			return this.root;
 		}
 
+		/**
+		 * Loops through the string of relationship queries and prints the relationship
+		 * for each node pair
+		 * 
+		 * @param queryString The string of letters representing the nodes to compare
+		 *                    for relationships
+		 */
 		public void printRelationships(String queryString) {
 			for (int i = 0; i < queryString.length(); i += 2) {
 				System.out.println(this.getRelationship(queryString.charAt(i), queryString.charAt(i + 1)));
 			}
 		}
 
+		/**
+		 * Takes two Node char values and returns a string representing their
+		 * relationship to each other. Resets relationship markers before returning.
+		 * 
+		 * @param char1 Char value of node 1
+		 * @param char2 Char value of node 2
+		 * @return String representing the relationship between the two nodes
+		 */
 		public String getRelationship(char char1, char char2) {
+			Node commonAncestor = null;
+			
 			// Get pointers to target nodes
 			Node node1 = this.lookup(char1);
 			Node node2 = this.lookup(char2);
+			
+			// Pointers to current node in each ancestry chain
+			Node current1 = node1;
+			Node current2 = node2;
+			
+			// Loop through ancestry chains to find common ancestor
+			while (current1.getParent() != null) {
+				while (current2.getParent() != null) {
+					if (current2.getData() == current1.getData()) {
+						// This is the lowest common ancestor
+						commonAncestor = current2;
+						break;
+					}
+					current2 = current2.getParent();
+				}
+				if (current2.getData() == current1.getData()) {
+					// This is the lowest common ancestor
+					break;
+				}
+				current1 = current1.getParent();
+			}
+			
+			// Count marks to common ancestor
+			int marks1 = 0;
+			int marks2 = 0;
+			if (node1.getParent() == null) {
+				// node1 is tree root
+				while (current2.getParent() != null) {
+					current2 = current2.getParent();
+					marks2++;
+				}
+			} else {
+				current1 = node1;
+				current2 = node2;
+				while (current1.getData() != commonAncestor.getData()) {
+					current1 = current1.getParent();
+					marks1++;
+				}
+				while (current2.getData() != commonAncestor.getData()) {
+					current2 = current2.getParent();
+					marks2++;
+				}
+			}
+			
+			// Determine relationship from mark counts and print
+			if (marks1 == 0) {
+				if (marks2 == 0) {
+					return char1 + " is " + char2 + ".";
+				} else if (marks2 == 1) {
+					return char1 + " is " + char2 + "'s parent.";
+				} else if (marks2 == 2) {
+					return char1 + " is " + char2 + "'s grandparent.";
+				} else if (marks2 == 3) {
+					return char1 + " is " + char2 + "'s great-grandparent.";
+				} else if (marks2 > 3) {
+					String output = char1 + " is " + char2 + "'s ";
+					int i = marks2;
+					while (marks2 >= 3) {
+						output += "great-";
+						marks2--;
+					}
+					output += "grandparent.";
+					return output; 
+				}
+			} else if (marks1 == 1) {
+				if (marks2 == 0) {
+					return char1 + " is " + char2 + "'s child.";
+				} else if (marks2 == 1) {
+					return char1 + " is " + char2 + "'s sibling.";
+				} else if (marks2 == 2) {
+					return char1 + " is " + char2 + "'s aunt/uncle.";
+				} else if (marks2 > 2) {
+					String output = char1 + " is " + char2 + "'s ";
+					int i = marks2;
+					while (marks2 >= 2) {
+						output += "great-";
+						marks2--;
+					}
+					output += "aunt/uncle.";
+					return output; 
+				}
+			}
+			
 
 			// Reset relationship markers
 			node1.resetMarks();
