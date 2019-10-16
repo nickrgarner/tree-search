@@ -240,51 +240,66 @@ public class TreeMain {
 		public String getRelationship(char char1, char char2) {
 			Node commonAncestor = null;
 
-			// Get pointers to target nodes
+			// Get pointers to target nodes, mark node1 ancestry chain
 			Node node1 = this.lookup(char1);
 			Node node2 = this.lookup(char2);
+			node1.markAncestry();
 
 			// Pointers to current node in each ancestry chain
 			Node current1 = node1;
 			Node current2 = node2;
 
-			// Loop through ancestry chains to find common ancestor
-			while (current1.getParent() != null) {
-				while (current2.getParent() != null) {
-					if (current2.getData() == current1.getData()) {
-						// This is the lowest common ancestor
-						commonAncestor = current2;
-						break;
-					}
-					current2 = current2.getParent();
-				}
-				if (current2.getData() == current1.getData()) {
-					// This is the lowest common ancestor
-					break;
-				}
-				current1 = current1.getParent();
+			// Move through node2's ancestry chain to find common ancestor
+			while (current2.getParent() != null && current2.getMark() != true) {
+				current2 = current2.getParent();
 			}
+			commonAncestor = current2;
+//			while (current1.getParent() != null) {
+//				while (current2.getParent() != null) {
+//					if (current2.getData() == current1.getData()) {
+//						// This is the lowest common ancestor
+//						commonAncestor = current2;
+//						break;
+//					}
+//					current2 = current2.getParent();
+//				}
+//				if (current2.getData() == current1.getData()) {
+//					// This is the lowest common ancestor
+//					break;
+//				}
+//				current1 = current1.getParent();
+//			}
 
 			// Count marks to common ancestor
 			int marks1 = 0;
 			int marks2 = 0;
-			if (node1.getParent() == null) {
-				// node1 is tree root
-				while (current2.getParent() != null) {
-					current2 = current2.getParent();
-					marks2++;
-				}
-			} else {
-				current1 = node1;
-				current2 = node2;
-				while (current1.getData() != commonAncestor.getData()) {
-					current1 = current1.getParent();
-					marks1++;
-				}
-				while (current2.getData() != commonAncestor.getData()) {
-					current2 = current2.getParent();
-					marks2++;
-				}
+//			if (node1.getParent() == null) {
+//				// node1 is tree root
+//				while (current2.getParent() != null) {
+//					current2 = current2.getParent();
+//					marks2++;
+//				}
+//			} else {
+//				current1 = node1;
+//				current2 = node2;
+//				while (current1.getData() != commonAncestor.getData()) {
+//					current1 = current1.getParent();
+//					marks1++;
+//				}
+//				while (current2.getData() != commonAncestor.getData()) {
+//					current2 = current2.getParent();
+//					marks2++;
+//				}
+//			}
+			current1 = node1;
+			current2 = node2;
+			while (current1.getData() != commonAncestor.getData()) {
+				current1 = current1.getParent();
+				marks1++;
+			}
+			while (current2.getData() != commonAncestor.getData()) {
+				current2 = current2.getParent();
+				marks2++;
 			}
 
 			// Determine relationship from mark counts and print
@@ -371,7 +386,7 @@ public class TreeMain {
 			String lineage = this.getLineage(data);
 
 			Node current = this.getRoot();
-			current.setMark(true);
+//			current.setMark(true);
 			int index = lineage.length() - 1;
 			while (current.getData() != data) {
 				if (current.getData() == lineage.charAt(index)) {
@@ -380,7 +395,7 @@ public class TreeMain {
 				for (int i = 0; i < current.getChildren().length; i++) {
 					if (current.getChildren()[i].getData() == lineage.charAt(index)) {
 						current = current.getChildren()[i];
-						current.setMark(true);
+//						current.setMark(true);
 						break;
 					}
 				}
@@ -570,6 +585,15 @@ public class TreeMain {
 				this.mark = flag;
 			}
 
+			/**
+			 * Returns this node's mark flag as a boolean value
+			 * 
+			 * @return Boolean value for this node's mark
+			 */
+			public boolean getMark() {
+				return this.mark;
+			}
+
 			public char getData() {
 				return this.data;
 			}
@@ -620,6 +644,19 @@ public class TreeMain {
 					return true;
 				}
 				return false;
+			}
+
+			/**
+			 * Traverses upwards through this node's ancestry chain and sets all mark flags
+			 * to true for use in determining relationships to other nodes.
+			 */
+			public void markAncestry() {
+				Node current = this;
+				current.setMark(true);
+				while (current.getParent() != null) {
+					current = current.getParent();
+					current.setMark(true);
+				}
 			}
 
 			/**
