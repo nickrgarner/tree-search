@@ -41,9 +41,9 @@ public class TreeMain {
 		Tree tree1 = treeMain.new Tree();
 		tree1.setRoot(tree1.buildTree(numNodes, 0, 0));
 
-		// Create string of relationship queries
+		// Create string of relationship queries, print answers
 		String queries = getQueryString(input);
-//		tree1.printRelationships(queries);
+		tree1.printRelationships(queries);
 
 		// Create level order queue and print
 		nodeQueue = treeMain.new Queue<Tree.Node>();
@@ -239,15 +239,15 @@ public class TreeMain {
 		 */
 		public String getRelationship(char char1, char char2) {
 			Node commonAncestor = null;
-			
+
 			// Get pointers to target nodes
 			Node node1 = this.lookup(char1);
 			Node node2 = this.lookup(char2);
-			
+
 			// Pointers to current node in each ancestry chain
 			Node current1 = node1;
 			Node current2 = node2;
-			
+
 			// Loop through ancestry chains to find common ancestor
 			while (current1.getParent() != null) {
 				while (current2.getParent() != null) {
@@ -264,7 +264,7 @@ public class TreeMain {
 				}
 				current1 = current1.getParent();
 			}
-			
+
 			// Count marks to common ancestor
 			int marks1 = 0;
 			int marks2 = 0;
@@ -286,7 +286,7 @@ public class TreeMain {
 					marks2++;
 				}
 			}
-			
+
 			// Determine relationship from mark counts and print
 			if (marks1 == 0) {
 				if (marks2 == 0) {
@@ -299,13 +299,12 @@ public class TreeMain {
 					return char1 + " is " + char2 + "'s great-grandparent.";
 				} else if (marks2 > 3) {
 					String output = char1 + " is " + char2 + "'s ";
-					int i = marks2;
 					while (marks2 >= 3) {
 						output += "great-";
 						marks2--;
 					}
 					output += "grandparent.";
-					return output; 
+					return output;
 				}
 			} else if (marks1 == 1) {
 				if (marks2 == 0) {
@@ -314,18 +313,45 @@ public class TreeMain {
 					return char1 + " is " + char2 + "'s sibling.";
 				} else if (marks2 == 2) {
 					return char1 + " is " + char2 + "'s aunt/uncle.";
-				} else if (marks2 > 2) {
+				} else if (marks2 >= 2) {
 					String output = char1 + " is " + char2 + "'s ";
-					int i = marks2;
-					while (marks2 >= 2) {
+					while (marks2 >= 3) {
 						output += "great-";
 						marks2--;
 					}
 					output += "aunt/uncle.";
-					return output; 
+					return output;
+				}
+			} else if (marks1 == 2) {
+				if (marks2 == 0) {
+					return char1 + " is " + char2 + "'s grandchild.";
+				} else if (marks2 == 1) {
+					return char1 + " is " + char2 + "'s niece/nephew.";
+				}
+			} else if (marks1 >= 2) {
+				if (marks2 == 1) {
+					String output = char1 + " is " + char2 + "'s ";
+					while (marks1 >= 2) {
+						output += "great-";
+						marks1--;
+					}
+					output += "niece/nephew.";
+					return output;
+				} else if (marks2 >= 2) {
+					return char1 + " is " + char2 + "'s " + Integer.min(marks1, marks2) + "th cousin "
+							+ Math.abs(marks1 - marks2) + " times removed.";
+				}
+			} else if (marks1 >= 3) {
+				if (marks2 == 0) {
+					String output = char1 + " is " + char2 + "'s ";
+					while (marks1 >= 3) {
+						output += "great-";
+						marks1--;
+					}
+					output += "niece/nephew.";
+					return output;
 				}
 			}
-			
 
 			// Reset relationship markers
 			node1.resetMarks();
