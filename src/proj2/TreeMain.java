@@ -49,9 +49,6 @@ public class TreeMain {
 		nodeQueue = treeMain.new Queue<Tree.Node>();
 		System.out.println("Level-Order Traversal:");
 		tree1.getRoot().levelOrder();
-		
-		System.out.println("\nLineage for Node W:");
-		System.out.println(tree1.getLineage('W'));
 	}
 
 	/**
@@ -243,54 +240,23 @@ public class TreeMain {
 		 * @return Node containing the given data parameter.
 		 */
 		public Node lookup(char data) {
-			char rootChar = this.getRoot().getData();
-			String lineage = "" + data;
-
-			// Think I need to loop here until parent = root
-			int preindex = getIndex(pretrav, data);
-			int postindex = getIndex(posttrav, data);
-			char parent = ' ';
-			while (parent != rootChar) {
-				String pretravBackwards = "";
-				for (int i = preindex; i > 0; i--) {
-					pretravBackwards += pretrav[i];
+//			char rootChar = this.getRoot().getData();
+			String lineage = this.getLineage(data);
+			
+			Node current = this.getRoot();
+			int index = lineage.length() - 1;
+			while (current.getData() != data) {
+				if (current.getData() == lineage.charAt(index)) {
+					index--;
 				}
-				// Loop through posttraversal and compare to pretravBackwards to find parent
-				for (int i = postindex + 1; i < posttrav.length; i++) {
-					char temp = posttrav[i];
-					for (int j = 0; j < pretravBackwards.length(); j++) {
-						if (pretravBackwards.charAt(j) == temp) {
-							// It's the parent
-							parent = pretravBackwards.charAt(j);
-							break;
-						}
-					}
-					if (parent == temp) {
+				for (int i = 0; i < current.getChildren().length; i++) {
+					if (current.getChildren()[i].getData() == lineage.charAt(index)) {
+						current = current.getChildren()[i];
 						break;
 					}
 				}
-				lineage += parent;
-				preindex = getIndex(pretrav, parent);
-				postindex = getIndex(posttrav, parent);
 			}
-			return null;
-//			if (data == this.getData()) {
-//				return this;
-//			}
-//			else if (this.childrenContains(data)) {
-//				for (int i = 0; i < this.getChildren().length; i++) {
-//					if (this.getChildren()[i].getData() == data) {
-//						return this.getChildren()[i];
-//					}
-//				}
-//			} else {
-//				if (this.getChildren() != null) {
-//					for (int i = 0; i < this.getChildren().length; i++) {
-//						return this.getChildren()[i].lookup(data);
-//					}
-//				}
-//			}
-//			return null;
+			return current;
 		}
 
 		/**
