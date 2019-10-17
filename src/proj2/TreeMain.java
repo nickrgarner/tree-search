@@ -47,7 +47,7 @@ public class TreeMain {
 
 		// Create level order queue and print
 		nodeQueue = treeMain.new Queue<Tree.Node>();
-		System.out.println("Level-Order Traversal:");
+//		System.out.println("Level-Order Traversal:");
 		tree1.getRoot().levelOrder();
 	}
 
@@ -293,6 +293,7 @@ public class TreeMain {
 //			}
 			current1 = node1;
 			current2 = node2;
+			
 			while (current1.getData() != commonAncestor.getData()) {
 				current1 = current1.getParent();
 				marks1++;
@@ -301,7 +302,11 @@ public class TreeMain {
 				current2 = current2.getParent();
 				marks2++;
 			}
-
+			
+			// Reset relationship markers
+			node1.resetMarks();
+			node2.resetMarks();
+			
 			// Determine relationship from mark counts and print
 			if (marks1 == 0) {
 				if (marks2 == 0) {
@@ -337,14 +342,18 @@ public class TreeMain {
 					output += "aunt/uncle.";
 					return output;
 				}
-			} else if (marks1 == 2) {
-				if (marks2 == 0) {
-					return char1 + " is " + char2 + "'s grandchild.";
-				} else if (marks2 == 1) {
-					return char1 + " is " + char2 + "'s niece/nephew.";
-				}
+//			} else if (marks1 == 2) {
+//				if (marks2 == 0) {
+//					return char1 + " is " + char2 + "'s grandchild.";
+//				} else if (marks2 == 1) {
+//					return char1 + " is " + char2 + "'s niece/nephew.";
+//				}
 			} else if (marks1 >= 2) {
-				if (marks2 == 1) {
+				if (marks1 == 2 && marks2 == 0) {
+					return char1 + " is " + char2 + "'s grandchild.";
+				} else if (marks1 == 2 && marks2 == 1) {
+					return char1 + " is " + char2 + "'s niece/nephew.";
+				} else if (marks2 == 1) {
 					String output = char1 + " is " + char2 + "'s ";
 					while (marks1 >= 2) {
 						output += "great-";
@@ -353,7 +362,7 @@ public class TreeMain {
 					output += "niece/nephew.";
 					return output;
 				} else if (marks2 >= 2) {
-					return char1 + " is " + char2 + "'s " + Integer.min(marks1, marks2) + "th cousin "
+					return char1 + " is " + char2 + "'s " + (Integer.min(marks1, marks2) - 1) + "th cousin "
 							+ Math.abs(marks1 - marks2) + " times removed.";
 				}
 			} else if (marks1 >= 3) {
@@ -368,9 +377,6 @@ public class TreeMain {
 				}
 			}
 
-			// Reset relationship markers
-			node1.resetMarks();
-			node2.resetMarks();
 			return "";
 		}
 
