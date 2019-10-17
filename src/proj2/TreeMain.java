@@ -692,6 +692,7 @@ public class TreeMain {
 						}
 					}
 				}
+				System.out.print("\n");
 			}
 		}
 	}
