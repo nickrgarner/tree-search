@@ -4,6 +4,15 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
+/**
+ * Class defines main program flow of tree parsing program. Reads in pre and
+ * posttraversal order from input redirection into static arrays and uses Tree
+ * and Queue methods to answer relationship queries and print the tree's
+ * level-order traversal.
+ * 
+ * @author Nick Garner
+ *
+ */
 public class TreeMain {
 
 	/** Array containing the Pretraversal order from input */
@@ -15,6 +24,13 @@ public class TreeMain {
 	/** Queue to hold nodes in level order traversal for printing */
 	public static Queue<Tree.Node> nodeQueue;
 
+	/**
+	 * Starting point of tree building program. Controls overall process flow
+	 * through building the tree, answering relationship queries, and printing the
+	 * tree's level-order traversal.
+	 * 
+	 * @param args
+	 */
 	public static void main(String[] args) {
 		// Setup BufferedReader for input
 		BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
@@ -155,6 +171,14 @@ public class TreeMain {
 		return numChildren;
 	}
 
+	/**
+	 * Inner class defines state and behavior of generic tree structure. Methods
+	 * include main recursive buildTree function and behavior for parsing
+	 * relationships between nodes.
+	 * 
+	 * @author Nick Garner
+	 *
+	 */
 	public class Tree {
 
 		/** Root of tree */
@@ -254,46 +278,14 @@ public class TreeMain {
 				current2 = current2.getParent();
 			}
 			commonAncestor = current2;
-//			while (current1.getParent() != null) {
-//				while (current2.getParent() != null) {
-//					if (current2.getData() == current1.getData()) {
-//						// This is the lowest common ancestor
-//						commonAncestor = current2;
-//						break;
-//					}
-//					current2 = current2.getParent();
-//				}
-//				if (current2.getData() == current1.getData()) {
-//					// This is the lowest common ancestor
-//					break;
-//				}
-//				current1 = current1.getParent();
-//			}
 
 			// Count marks to common ancestor
 			int marks1 = 0;
 			int marks2 = 0;
-//			if (node1.getParent() == null) {
-//				// node1 is tree root
-//				while (current2.getParent() != null) {
-//					current2 = current2.getParent();
-//					marks2++;
-//				}
-//			} else {
-//				current1 = node1;
-//				current2 = node2;
-//				while (current1.getData() != commonAncestor.getData()) {
-//					current1 = current1.getParent();
-//					marks1++;
-//				}
-//				while (current2.getData() != commonAncestor.getData()) {
-//					current2 = current2.getParent();
-//					marks2++;
-//				}
-//			}
+
 			current1 = node1;
 			current2 = node2;
-			
+
 			while (current1.getData() != commonAncestor.getData()) {
 				current1 = current1.getParent();
 				marks1++;
@@ -302,11 +294,11 @@ public class TreeMain {
 				current2 = current2.getParent();
 				marks2++;
 			}
-			
+
 			// Reset relationship markers
 			node1.resetMarks();
 			node2.resetMarks();
-			
+
 			// Determine relationship from mark counts and print
 			if (marks1 == 0) {
 				if (marks2 == 0) {
@@ -342,12 +334,6 @@ public class TreeMain {
 					output += "aunt/uncle.";
 					return output;
 				}
-//			} else if (marks1 == 2) {
-//				if (marks2 == 0) {
-//					return char1 + " is " + char2 + "'s grandchild.";
-//				} else if (marks2 == 1) {
-//					return char1 + " is " + char2 + "'s niece/nephew.";
-//				}
 			} else if (marks1 >= 2) {
 				if (marks1 == 2 && marks2 == 0) {
 					return char1 + " is " + char2 + "'s grandchild.";
@@ -376,7 +362,6 @@ public class TreeMain {
 					return output;
 				}
 			}
-
 			return "";
 		}
 
@@ -392,7 +377,6 @@ public class TreeMain {
 			String lineage = this.getLineage(data);
 
 			Node current = this.getRoot();
-//			current.setMark(true);
 			int index = lineage.length() - 1;
 			while (current.getData() != data) {
 				if (current.getData() == lineage.charAt(index)) {
@@ -401,7 +385,6 @@ public class TreeMain {
 				for (int i = 0; i < current.getChildren().length; i++) {
 					if (current.getChildren()[i].getData() == lineage.charAt(index)) {
 						current = current.getChildren()[i];
-//						current.setMark(true);
 						break;
 					}
 				}
@@ -492,6 +475,15 @@ public class TreeMain {
 			}
 		}
 
+		/**
+		 * Inner class defines state and behavior of Nodes to be used in linked generic
+		 * tree structure. Methods include standard setters and getters for fields,
+		 * along with functionality for marking a node's ancestry chain to be used in
+		 * determining relationships to other nodes.
+		 * 
+		 * @author Nick Garner
+		 *
+		 */
 		private class Node {
 
 			/** Data contained in the Node */
@@ -510,6 +502,12 @@ public class TreeMain {
 				this(' ', null, null);
 			}
 
+			/**
+			 * Creates a node with the given char value and null pointers to parent and
+			 * child.
+			 * 
+			 * @param data The char value to create the node with.
+			 */
 			public Node(char data) {
 				this(data, null, null);
 			}
@@ -600,6 +598,11 @@ public class TreeMain {
 				return this.mark;
 			}
 
+			/**
+			 * Returns the data value contained in this node.
+			 * 
+			 * @return Char contained in this node.
+			 */
 			public char getData() {
 				return this.data;
 			}
