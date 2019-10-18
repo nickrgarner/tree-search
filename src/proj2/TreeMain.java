@@ -23,6 +23,9 @@ public class TreeMain {
 
 	/** Queue to hold nodes in level order traversal for printing */
 	public static Queue<Tree.Node> nodeQueue;
+	
+	/** Number of nodes contained in the traversal inputs */
+	public static int numNodes;
 
 	/**
 	 * Starting point of tree building program. Controls overall process flow
@@ -36,7 +39,7 @@ public class TreeMain {
 		BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
 		String pretravString = getInputString(input);
 		String posttravString = getInputString(input);
-		int numNodes = pretravString.length();
+		numNodes = pretravString.length();
 
 		// Initialize arrays with proper length
 		pretrav = new char[numNodes];
@@ -685,17 +688,22 @@ public class TreeMain {
 			 * Prints the level-order traversal of this tree
 			 */
 			public void levelOrder() {
+				int printCount = 0;
 				nodeQueue.enqueue(this);
 				while (!nodeQueue.isEmpty()) {
 					Node q = nodeQueue.dequeue();
+					if (printCount == numNodes - 1) {
+						System.out.print(q.getData() + ".\n");
+						break;
+					}
 					System.out.print(q.getData() + ", ");
+					printCount++;
 					if (q.getChildren() != null) {
 						for (int i = 0; i < q.getChildren().length; i++) {
 							nodeQueue.enqueue(q.getChildren()[i]);
 						}
 					}
 				}
-				System.out.print("\n");
 			}
 		}
 	}
@@ -711,7 +719,7 @@ public class TreeMain {
 	public class Queue<E> {
 
 		/** Node at the front of the list */
-		private Node front;
+		private QNode front;
 		/** Number of items in the queue */
 		private int size;
 
@@ -730,13 +738,13 @@ public class TreeMain {
 		 */
 		public void enqueue(E data) {
 			if (front == null) {
-				front = new Node(data);
+				front = new QNode(data);
 			} else {
-				Node current = front;
+				QNode current = front;
 				while (current.next != null) {
 					current = current.next;
 				}
-				current.next = new Node(data);
+				current.next = new QNode(data);
 			}
 			size++;
 		}
@@ -782,19 +790,19 @@ public class TreeMain {
 		 * @author Nick Garner, nrgarner
 		 *
 		 */
-		private class Node {
+		private class QNode {
 
 			/** Value to hold in the node */
 			private E data;
 			/** Pointer to the next node in the Queue */
-			private Node next;
+			private QNode next;
 
 			/**
 			 * Constructs a new node with the given value and a null next pointer
 			 * 
 			 * @param data Value to construct the new node with
 			 */
-			public Node(E data) {
+			public QNode(E data) {
 				this(data, null);
 			}
 
@@ -804,7 +812,7 @@ public class TreeMain {
 			 * @param data Value to construct the node with
 			 * @param next Pointer to the next node in the queue
 			 */
-			public Node(E data, Node next) {
+			public QNode(E data, QNode next) {
 				this.data = data;
 				this.next = next;
 			}
